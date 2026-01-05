@@ -113,8 +113,8 @@ Install NGINX Ingress Controller in the cluster
 
 Create:
 
-Deployment + Service for V1 (Production.yaml)
-# Deployment
+**Deployment + Service for V1 (Production.yaml)**
+Deployment
 ```
 apiVersion: apps/v1
 kind: Deployment
@@ -156,7 +156,7 @@ spec:
                 fieldPath: status.podIP
 ```
 
-# Service
+Service
 ```
 apiVersion: v1
 kind: Service
@@ -174,9 +174,9 @@ spec:
     app: production
 ```
 
-Deployment + Service for V2 (Canary.yaml)
+**Deployment + Service for V2 (Canary.yaml)**
 
-# Deployment
+Deployment
 ```
 apiVersion: apps/v1
 kind: Deployment
@@ -218,7 +218,7 @@ spec:
                 fieldPath: status.podIP
 ```
 
-# Service
+Service
 ```
 apiVersion: v1
 kind: Service
@@ -236,11 +236,10 @@ spec:
     app: canary
 ```
 
-Create two Ingress resources:
-
+**Create two Ingress resources:**
 One for V1 (ingress-prod.yaml)
 
-# Ingress
+Ingress
 ```
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -263,7 +262,8 @@ spec:
 
 One for V2 (ingress-canary.yaml)
 ```
-# Ingress
+
+Ingress
 ```
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -291,7 +291,7 @@ Canary Ingress Annotation Example
 nginx.ingress.kubernetes.io/canary: "true"
 nginx.ingress.kubernetes.io/canary-weight: "10"
 
-Traffic Verification Command:
+**Traffic Verification Command:**
 ```
 for i in $(seq 1 10); do
   curl -s --resolve echo.prod.mydomain.com:80:<IP> echo.prod.mydomain.com | grep "Hostname"
@@ -318,7 +318,7 @@ Green → New version (V2)
 
 Example:
 
-1.Blue Deployment (Current Production)
+**1.Blue Deployment (Current Production)**
 
 Blue-deployment.yaml
 ```
@@ -345,7 +345,7 @@ spec:
         - containerPort: 80
 ```	
 		
-2.Green Deployment (New Version)
+**2.Green Deployment (New Version)**
 
 green-deployment.yaml
 ```
@@ -371,7 +371,7 @@ spec:
         ports:
         - containerPort: 80	
 ```
-3.Service (Switch Selector to Change Traffic)
+**3.Service (Switch Selector to Change Traffic)**
 Service pointing to Blue
 
 traffic-service.yaml
@@ -395,47 +395,53 @@ selector:
   env: green
 ```
 
-Verify traffic steps:
+**Verify traffic steps:**
 
 Step 1: Verify Both Environments Are Running
+```
 kubectl get pods -l app=myapp
-
+```
 Confirm:
 Blue pods are running (env=blue)
 Green pods are running (env=green)
 No CrashLoopBackOff or Pending pods
 
 2: Verify Pod Labels (Very Important)
+```
 kubectl get pods --show-labels
-
+```
 
 ✔️Check:
 Blue pods → env=blue
 Green pods → env=green
 
 3: Verify Service Selector (Traffic Controller)
+```
 kubectl get svc myapp-service -o yaml
-
+```
 
 ✔️ Confirm selector:
 Before switch (Blue live):
+```
 selector:
   app: myapp
   env: blue
-
+```
 
 After switch (Green live):
-
+```
 selector:
   app: myapp
   env: green
-
+```
 This step confirms which version is serving production traffic.
 
 4: Verify Traffic Internally (Cluster)
+```
 for i in $(seq 1 10); do
   curl http://myapp-service
 done
+```
 
 
 **Expected:**
