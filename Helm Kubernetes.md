@@ -65,24 +65,24 @@ Version
 App version
 Maintainer
 
-**Install Helm on Ubuntu (Recommended Method)**
-### 🔹 Step 1: Download Helm install script
+### Install Helm on Ubuntu (Recommended Method)
+**🔹 Step 1: Download Helm install script**
 ```
 curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 -o get_helm.sh
 ```
-### 🔹 Step 2: Give execute permission
+**🔹 Step 2: Give execute permission**
 ```
 chmod +x get_helm.sh
 ```
-### 🔹 Step 3: Install Helm
+**🔹 Step 3: Install Helm**
 ```
 ./get_helm.sh
 ```
-### 🔹 Step 4: Verify installation
+**🔹 Step 4: Verify installation**
 ```
 helm version
 ```
-Expected output (example):
+**Expected output (example):**
 version.BuildInfo{Version:"v3.14.x", GoVersion:"go1.21.x"}
 
 
