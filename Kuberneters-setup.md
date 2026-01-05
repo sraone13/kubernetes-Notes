@@ -12,7 +12,7 @@ Calico CNI
 
 
 
-##🧱 Architecture
+### 🧱 Architecture
 
 EC2-1 → Control Plane (Master)
 
@@ -25,8 +25,8 @@ OS: Ubuntu 22.04
 Instance type: t3.medium or higher (minimum 2 GB RAM)
 
 
-🔑 Prerequisites (IMPORTANT)
-✅ On ALL EC2 instances
+### 🔑 Prerequisites (IMPORTANT)
+### ✅ On ALL EC2 instances
 
 Same VPC
 
@@ -39,17 +39,18 @@ All traffic within SG
 Hostnames set
 
 Run as root user
+```
 sudo -i
+```
 
-
-📜 Script 1: Common Kubernetes Setup (Run on ALL Nodes)
+### 📜 Script 1: Common Kubernetes Setup (Run on ALL Nodes)
 
 Create file:
-
+```
 vi k8s-common.sh
-
+```
 Paste 👇
-
+```
 #!/bin/bash
 set -e
 
@@ -103,23 +104,24 @@ apt install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 
 echo "✅ Common setup completed"
+```
 
 Run:
-
+```
 chmod +x k8s-common.sh
 ./k8s-common.sh
+```
 
+### 👉 Run this on master + both worker nodes
 
-👉 Run this on master + both worker nodes
-
-📜 Script 2: Initialize Control Plane (MASTER only)
+### 📜 Script 2: Initialize Control Plane (MASTER only)
 
 Create:
-
+```
 vi master-init.sh
-
+```
 Paste 👇
-
+```
 #!/bin/bash
 set -e
 
@@ -135,29 +137,30 @@ echo "🌐 Installing Calico CNI"
 kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/calico.yaml
 
 echo "✅ Master setup completed"
-
+```
 
 Run:
-
+```
 chmod +x master-init.sh
 ./master-init.sh
+```
 
-
-🔗 Join Worker Nodes to Cluster
+### 🔗 Join Worker Nodes to Cluster
 
 After kubeadm init, you’ll see a join command like this:
-
+```
 kubeadm join <MASTER-IP>:6443 \
 --token xxxxxx \
 --discovery-token-ca-cert-hash sha256:xxxx
-
+```
 👉 Copy this command
 
 👉 Run it on Node-1 and Node-2
 
-✅ Verify Cluster (On Master)
+### ✅ Verify Cluster (On Master)
+```
 kubectl get nodes
-
+```
 
 Expected output:
 
