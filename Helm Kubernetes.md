@@ -1,4 +1,4 @@
-1️. What is Helm?
+### 1️. What is Helm?
 
 Helm is a package manager for Kubernetes.
 It helps you install, upgrade, rollback, and uninstall Kubernetes applications easily using reusable packages called Charts.
@@ -11,9 +11,9 @@ Prometheus
 Grafana
 AWS Load Balancer Controller
 
-2️.Why Helm is Needed?
+### 2️.Why Helm is Needed?
 
-Without Helm ❌
+### Without Helm ❌
 
 DevOps/SRE teams must:
 Write multiple YAML files manually
@@ -21,17 +21,17 @@ Maintain scripts for each Kubernetes controller
 Handle multiple versions separately
 Repeat same configs across environments
 
-With Helm ✅
+### With Helm ✅
 One command to install/update apps
 Versioned deployments
 Reusable templates
 Environment-specific configuration
 Easy rollback
 
-👉 Single command replaces hundreds of YAML lines
+### 👉 Single command replaces hundreds of YAML lines
 
 
-3️.Key Helm Concepts
+### 3️.Key Helm Concepts
 
 🔹 Chart:
 A Helm Chart is a bundle/package of Kubernetes manifests.
@@ -48,7 +48,7 @@ Bitnami
 EKS charts
 Custom internal repos
 
-4️.Helm Chart Structure
+### 4️.Helm Chart Structure
 mychart/
 ├── Chart.yaml        # Metadata (name, version, description)
 ├── values.yaml       # Default configuration values
@@ -65,56 +65,82 @@ Version
 App version
 Maintainer
 
-5️.Common Helm Commands for Repository Management
+### 5️.Common Helm Commands for Repository Management
+```
 helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+```
 helm repo list
+```
+```
 helm repo update
-
-Search Charts:
+```
+**Search Charts:**
+```
 helm search repo bitnami
+```
+```
 helm search repo bitnami | grep -i argocd
+```
 
-6️.Installing Applications Using Helm
+### 6️.Installing Applications Using Helm
 Install NGINX
+```
 helm install my-nginx bitnami/nginx
-
+```
 Install Prometheus
+```
 helm install prometheus bitnami/prometheus
-
-Install AWS Load Balancer Controller (EKS)
+```
+**Install AWS Load Balancer Controller (EKS)**
+```
 helm repo add eks https://aws.github.io/eks-charts
+```
+```
 helm repo update
+```
+```
 helm install alb eks/aws-load-balancer-controller
+```
 
-7️.Upgrade, Rollback & Uninstall
+### 7️.Upgrade, Rollback & Uninstall
 Upgrade
+```
 helm upgrade my-nginx bitnami/nginx
-
+```
 Rollback
+```
 helm rollback my-nginx 1
-
+```
 Uninstall
+```
 helm uninstall my-nginx
 helm uninstall prometheus
+```
 
-8️.Example: E-Commerce Project Using Helm Charts
+### 8️.Example: E-Commerce Project Using Helm Charts
 Project Structure
 best-commerce/
 ├── payments/
 ├── shipping/
 
 Create Charts
+```
 mkdir -p best-commerce/{payments,shipping}
+```
+```
 cd best-commerce
-
+```
+```
 helm create payments
 helm create shipping
+```
 
-9️.Modify Charts (Payments / Shipping)
+### 9️.Modify Charts (Payments / Shipping)
 
 Inside each Payments: 
 templates/deployment.yaml:
-
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -139,15 +165,17 @@ spec:
             - sh
             - -c
             - "echo {{ .Values.appMessage }}; sleep 3600"
-			
+```		
 
 Values.yaml:
+```
 image:
   repository: busybox
   tag: latest
   pullPolicy: IfNotPresent
 
 appMessage: "Payments Service"
+```
 
 
 Chart.yaml
@@ -156,7 +184,7 @@ Keep as it is
 
 Inside each Shipping: 
 templates/deployment.yaml:
-
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -181,32 +209,40 @@ spec:
             - sh
             - -c
             - "echo {{ .Values.appMessage }}; sleep 3600"
-			
+```			
 
 Values.yaml:
+```
 image:
   repository: busybox
   tag: latest
   pullPolicy: IfNotPresent
 
 appMessage: "Shipping Service"
-
+```
 
 Chart.yaml
 Keep as it is
 
 
-10.Packaging Helm Charts run below commands from best-commerce
+### 10.Packaging Helm Charts run below commands from best-commerce
+```
 helm package payments
 helm package shipping
+```
 
 ✔ Creates .tgz files (zip-like packages)
 
-1️1.Creating Helm Repository Index
+### 11.Creating Helm Repository Index
+```
 helm repo index .
+```
+```
 ls -ltr
+```
+```
 cat index.yaml
-
+```
 
 index.yaml contains metadata for all charts
 
