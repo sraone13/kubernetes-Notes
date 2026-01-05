@@ -1,6 +1,6 @@
-Kubernetes Deployment Strategies:
+# Kubernetes Deployment Strategies:
 
-1.Why Deployment Strategies Are Important
+### 1.Why Deployment Strategies Are Important
 
 Deployment strategies help release new application versions without downtime.
 If you don’t follow a proper strategy, applications may face service interruption.
@@ -17,57 +17,63 @@ Solution: Use proper deployment strategies.
 
 Types of Deployment Strategies:
 
-Rolling Update (Default in Kubernetes)
+**Rolling Update (Default in Kubernetes)**
 
-Canary Deployment
+**Canary Deployment**
 
-Blue–Green Deployment
+**Blue–Green Deployment**
 
-1️.Rolling Update Deployment
+### 1️.Rolling Update Deployment
 
-Definition:
+**Definition:**
 Rolling Update is the default deployment strategy in Kubernetes.
 It updates the application pod by pod instead of stopping all pods at once.
 Ensures zero or near-zero downtime.
 
-How It Works:
+**How It Works:**
 Old pods are terminated gradually.
 New version pods are created one by one.
 Traffic is always served because some pods are always running.
 
-Key Benefits:
+**Key Benefits:**
 No downtime
 Safe and controlled rollout
 Easy rollback
 
-Important Parameters:
+**Important Parameters:**
 maxUnavailable – Max number of pods that can be unavailable during update
 maxSurge – Extra pods created temporarily during update
 Example: 25% maxSurge
 
 Commands (Rolling Update)
+```
 kubectl create deployment nginx --image=nginx
-
+```
 
 Watch pods updating:
+```
 kubectl get pods -w
-
+```
 Update image:
+```
 kubectl set image deployment/nginx nginx=nginx:1.22 --record
-
+```
 
 Check rollout status:
+```
 kubectl rollout status deployment/nginx
-
+```
 
 Rollback if something goes wrong:
+```
 kubectl rollout undo deployment/nginx
-
+```
 
 Check rollout history:
+```
 kubectl rollout history deployment/nginx
-
-2️.Canary Deployment:
+```
+### 2️.Canary Deployment:
 
 Canary deployment releases a small percentage of traffic to a new version (V2).
 Used to test stability in real production traffic.
@@ -109,6 +115,7 @@ Create:
 
 Deployment + Service for V1 (Production.yaml)
 # Deployment
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -147,8 +154,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
----
+```
+
 # Service
+```
 apiVersion: v1
 kind: Service
 metadata:
@@ -163,11 +172,12 @@ spec:
     name: http
   selector:
     app: production
-
+```
 
 Deployment + Service for V2 (Canary.yaml)
 
 # Deployment
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -206,8 +216,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
----
+```
+
 # Service
+```
 apiVersion: v1
 kind: Service
 metadata:
@@ -222,13 +234,14 @@ spec:
     name: http
   selector:
     app: canary
-
+```
 
 Create two Ingress resources:
 
 One for V1 (ingress-prod.yaml)
 
 # Ingress
+```
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -249,8 +262,9 @@ spec:
               number: 80
 
 One for V2 (ingress-canary.yaml)
-
+```
 # Ingress
+```
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -271,17 +285,18 @@ spec:
             name: canary
             port:
               number: 80
-
+```
 
 Canary Ingress Annotation Example
 nginx.ingress.kubernetes.io/canary: "true"
 nginx.ingress.kubernetes.io/canary-weight: "10"
 
 Traffic Verification Command:
+```
 for i in $(seq 1 10); do
   curl -s --resolve echo.prod.mydomain.com:80:<IP> echo.prod.mydomain.com | grep "Hostname"
 done
-
+```
 
 You will see responses from both V1 and V2.
 
@@ -293,7 +308,7 @@ Done over days or a week
 
 Once stable, V2 becomes full production
 
-3️.Blue–Green Deployment
+### 3️.Blue–Green Deployment
 Definition
 Blue–Green is a zero-downtime deployment strategy.
 Maintains two identical environments:
@@ -306,7 +321,7 @@ Example:
 1.Blue Deployment (Current Production)
 
 Blue-deployment.yaml
-
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -328,12 +343,12 @@ spec:
         image: nginx:1.21
         ports:
         - containerPort: 80
-		
+```	
 		
 2.Green Deployment (New Version)
 
 green-deployment.yaml
-
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -355,12 +370,12 @@ spec:
         image: nginx:1.22
         ports:
         - containerPort: 80	
-
+```
 3.Service (Switch Selector to Change Traffic)
 Service pointing to Blue
 
 traffic-service.yaml
-
+```
 apiVersion: v1
 kind: Service
 metadata:
@@ -372,13 +387,13 @@ spec:
   ports:
   - port: 80
     targetPort: 80
-		
+```		
 4.Switch Traffic to Green (Edit Service)
-
+```
 selector:
   app: myapp
   env: green
-
+```
 
 Verify traffic steps:
 
@@ -423,21 +438,21 @@ for i in $(seq 1 10); do
 done
 
 
-Expected:
+**Expected:**
 All responses come from only one version
 No mixed responses
 
 All requests go to Blue OR Green
 Zero errors
 
-How It Works:
+**How It Works:**
 
 Blue (V1) serves all traffic
 Green (V2) is deployed and fully tested
 Load Balancer switches traffic from Blue → Green
 If issues occur, instantly rollback to Blue
 
-Benefits:
+**Benefits:**
 Instant rollback
 Very safe
 No partial traffic issues
@@ -446,7 +461,7 @@ Costly
 Both environments run simultaneously
 Requires double resources
 
-Key Interview Points
+**Key Interview Points**
 
 Rolling Update is default in Kubernetes
 Canary & Blue–Green require Ingress or Load Balancer
